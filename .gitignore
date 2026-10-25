@@ -1,0 +1,9 @@
+.venv/
+dist/
+build/
+__pycache__/
+*.pyc
+*.egg-info/
+data/
+metadata.json      
+.ruff_cache/
