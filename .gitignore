@@ -4,7 +4,7 @@ build/
 __pycache__/
 *.pyc
 *.egg-info/
-data/
+data/*.json
 metadata.json      
 .ruff_cache/
 *.log
