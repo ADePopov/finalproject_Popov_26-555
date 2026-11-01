@@ -7,3 +7,6 @@ __pycache__/
 data/
 metadata.json      
 .ruff_cache/
+*.log
+logs/*
+!logs/.gitkeep
