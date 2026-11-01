@@ -12,7 +12,8 @@ class InsufficientFundsError(ValutaTradeError):
         self.code = code.upper()
         prec = 4 if self.code in ["BTC", "ETH"] else 2
         super().__init__(
-            f"Недостаточно средств: доступно {available:.{prec}f} {self.code}, требуется {required:.{prec}f} {self.code}"
+            f"Недостаточно средств: доступно {available:.{prec}f} {self.code},\n"
+            f"требуется {required:.{prec}f} {self.code}"
         )
 
 

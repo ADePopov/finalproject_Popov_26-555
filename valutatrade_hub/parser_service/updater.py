@@ -25,13 +25,19 @@ class RatesUpdater:
         pairs = snapshot.get("pairs", {})
         
         history_records = []
-        now_iso = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+        now_iso = (datetime.now(timezone.utc)
+                   .replace(microsecond=0)
+                   .isoformat()
+                   .replace("+00:00", "Z")
+                   )
         total_updated = 0
         has_errors = False
         
         for client in self.clients:
             # Фильтрация по флагу --source из CLI
-            if target_source and target_source.lower() not in client.source_name.lower():
+            if (target_source and 
+                target_source.lower() not in client.source_name.lower()
+            ):
                 continue
                 
             try:
@@ -72,8 +78,8 @@ class RatesUpdater:
         snapshot["last_refresh"] = now_iso
         
         if total_updated > 0:
-            print(f"INFO: Writing {total_updated} rates to {self.storage.rates_path}...")
-            logger.info(f"Writing {total_updated} rates to {self.storage.rates_path}...")
+            print(f"INFO: Writing {total_updated} rates to {self.storage.rates_path}..")
+            logger.info(f"Writing {total_updated} rates to {self.storage.rates_path}..")
             self.storage.save_rates(snapshot, history_records)
             
         return total_updated, now_iso, has_errors

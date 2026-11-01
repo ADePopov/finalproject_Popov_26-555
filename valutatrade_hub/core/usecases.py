@@ -5,13 +5,12 @@ from datetime import datetime
 from typing import Any
 
 from core.currencies import get_currency
-from decorators import log_action
 from core.exceptions import (
     ApiRequestError,
     CurrencyNotFoundError,
-    InsufficientFundsError
 )
 from core.models import Portfolio, Wallet
+from decorators import log_action
 from infra.settings import SettingsLoader
 
 settings = SettingsLoader()
@@ -185,7 +184,10 @@ def register(username: str, password: str) -> str:
     portfolios.append({"user_id": user_id, "wallets": {}})
     _write_json(portfolios_filepath, portfolios)
 
-    return f"Пользователь '{username}' зарегистрирован (id={user_id}). Войдите: login --username {username} --password ****"
+    return (
+        f"Пользователь '{username}' зарегистрирован (id={user_id}).\n"
+        f"Войдите: login --username {username} --password ****"
+    )
 
 
 def login(username: str, password: str) -> str:
@@ -300,7 +302,9 @@ def get_user_portfolio_data(username: str, base_currency: str = "USD") -> dict:
 
     wallets_dict = {}
     for code, w_data in user_portfolio["wallets"].items():
-        wallets_dict[code] = Wallet(currency_code=code, balance=w_data.get("balance", 0.0))
+        wallets_dict[code] = Wallet(
+            currency_code=code, balance=w_data.get("balance", 0.0)
+        )
 
     portfolio = Portfolio(user_id=user_id, wallets=wallets_dict)
 
@@ -337,12 +341,15 @@ def buy(arg1: Any, arg2: Any, arg3: float | None = None) -> dict:
     """Выполняет покупку валюты с пополнением баланса кошелька.
 
     Поддерживает две сигнатуры вызова:
-      1. buy(currency_code, amount) — вызов из интерфейса CLI (пользователь берётся из сессии).
+      1. buy(currency_code, amount) — вызов из интерфейса CLI 
+      (пользователь берётся из сессии).
       2. buy(user_id, currency_code, amount) — вызов программно или из автотестов.
 
     Args:
-        arg1: Тикер валюты (str) при 2 аргументах, либо user_id (int) при 3 аргументах.
-        arg2: Сумма покупки (float) при 2 аргументах, либо тикер валюты (str) при 3 аргументах.
+        arg1: Тикер валюты (str) при 2 аргументах, 
+        либо user_id (int) при 3 аргументах.
+        arg2: Сумма покупки (float) при 2 аргументах, 
+        либо тикер валюты (str) при 3 аргументах.
         arg3: Сумма покупки (float) при вызове с 3 аргументами, иначе None.
 
     Returns:
@@ -411,12 +418,15 @@ def sell(arg1: Any, arg2: Any, arg3: float | None = None) -> dict:
     """Выполняет продажу валюты со списанием средств с кошелька.
 
     Поддерживает две сигнатуры вызова:
-      1. sell(currency_code, amount) — вызов из интерфейса CLI (пользователь берётся из сессии).
+      1. sell(currency_code, amount) — вызов из интерфейса CLI 
+      (пользователь берётся из сессии).
       2. sell(user_id, currency_code, amount) — вызов программно или из автотестов.
 
     Args:
-        arg1: Тикер валюты (str) при 2 аргументах, либо user_id (int) при 3 аргументах.
-        arg2: Сумма продажи (float) при 2 аргументах, либо тикер валюты (str) при 3 аргументах.
+        arg1: Тикер валюты (str) при 2 аргументах, 
+        либо user_id (int) при 3 аргументах.
+        arg2: Сумма продажи (float) при 2 аргументах, 
+        либо тикер валюты (str) при 3 аргументах.
         arg3: Сумма продажи (float) при вызове с 3 аргументами, иначе None.
 
     Returns:
@@ -424,7 +434,8 @@ def sell(arg1: Any, arg2: Any, arg3: float | None = None) -> dict:
         new_balance, estimated_revenue и display_info.
 
     Raises:
-        ValueError: Если пользователь не авторизован, сумма неположительна или кошелёк не существует.
+        ValueError: Если пользователь не авторизован, 
+        сумма неположительна или кошелёк не существует.
         InsufficientFundsError: Если запрашиваемая сумма превышает доступный остаток.
         CurrencyNotFoundError: Если передан неизвестный тикер валюты.
     """
@@ -457,10 +468,11 @@ def sell(arg1: Any, arg2: Any, arg3: float | None = None) -> dict:
 
     if code not in wallets_data:
         raise ValueError(
-            f"У вас нет кошелька '{code}'. Добавьте валюту: она создаётся автоматически при первой покупке."
+            f"У вас нет кошелька '{code}'.\n"
+            "Добавьте валюту: она создаётся автоматически при первой покупке."
         )
 
-    # Списание через метод Wallet.withdraw() (бросает InsufficientFundsError при нехватке)
+    # Списание через метод Wallet.withdraw()(InsufficientFundsError при нехватке)
     wallet = Wallet(currency_code=code, balance=wallets_data[code].get("balance", 0.0))
     old_balance = wallet.balance
 
@@ -517,7 +529,9 @@ def get_rate(from_code: str, to_code: str) -> dict:
 
     rate = DEFAULT_RATES[c_from] / DEFAULT_RATES[c_to]
     reverse_rate = DEFAULT_RATES[c_to] / DEFAULT_RATES[c_from]
-    updated_at = rates_cache.get("last_refresh", datetime.now().isoformat()).replace("T", " ")
+    updated_at = rates_cache.get(
+        "last_refresh", datetime.now().isoformat()
+    ).replace("T", " ")
 
     return {
         "from": c_from,
@@ -536,7 +550,10 @@ def show_rates_data(currency: str = None, top: int = None, base: str = None) -> 
     last_refresh = rates_cache.get("last_refresh", "")
 
     if not pairs:
-        raise ValueError("Локальный кеш курсов пуст. Выполните 'update-rates', чтобы загрузить данные.")
+        raise ValueError(
+            "Локальный кеш курсов пуст.\n" 
+            "Выполните 'update-rates', чтобы загрузить данные."
+        )
 
     if currency:
         currency = currency.upper().strip()
@@ -557,7 +574,10 @@ def show_rates_data(currency: str = None, top: int = None, base: str = None) -> 
                 c_from, c_to = k.split("_")
                 if c_to == "USD" and c_from != base:
                     recalc_rate = v["rate"] / base_rate_to_usd
-                    new_pairs[f"{c_from}_{base}"] = {"rate": recalc_rate, "updated_at": v["updated_at"]}
+                    new_pairs[f"{c_from}_{base}"] = {
+                        "rate": recalc_rate, 
+                        "updated_at": v["updated_at"]
+                    }
             pairs = new_pairs
 
     if top:

@@ -9,7 +9,14 @@ authors = [
 requires-python = ">=3.12"
 dependencies = []
 
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+exclude = ["venv", ".venv", "dist", "__pycache__"]
 
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = [] 
 
 [project.scripts]
 valutatrade = "valutatrade_hub.cli.interface:main"
@@ -17,6 +24,11 @@ valutatrade = "valutatrade_hub.cli.interface:main"
 [build-system]
 requires = ["uv_build>=0.12.19,<0.13.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.17.3",
+]
 
 [tool.uv.build-backend]
 module-name = "valutatrade_hub"

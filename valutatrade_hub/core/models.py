@@ -1,6 +1,7 @@
 import hashlib
 import os
 from datetime import datetime
+
 from core.exceptions import InsufficientFundsError
 
 
@@ -14,7 +15,14 @@ class User:
     _salt: str
     _registration_date: datetime
 
-    def __init__(self, user_id: int, username: str, hashed_password: str, salt: str, registration_date: datetime):
+    def __init__(
+        self,
+        user_id: int,
+        username: str,
+        hashed_password: str,
+        salt: str,
+        registration_date: datetime
+    ):
         self._user_id = user_id
         self.username = username 
         self._hashed_password = hashed_password
@@ -100,7 +108,7 @@ class Wallet:
         if value < 0:
             raise InsufficientFundsError(
                 available=self.balance,
-                required=amount,
+                required=abs(value), 
                 code=self.currency_code
             )
         

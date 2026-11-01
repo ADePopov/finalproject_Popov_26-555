@@ -1,6 +1,6 @@
-import requests
 from abc import ABC, abstractmethod
 
+import requests
 from core.exceptions import ApiRequestError
 from parser_service.config import ParserConfig
 
@@ -51,9 +51,14 @@ class ExchangeRateApiClient(BaseApiClient):
 
     def fetch_rates(self) -> dict:
         if not config.EXCHANGERATE_API_KEY:
-            raise ApiRequestError("Не задан ключ EXCHANGERATE_API_KEY в переменных окружения")
+            raise ApiRequestError(
+                "Не задан ключ EXCHANGERATE_API_KEY\n"
+                "в переменных окружения"
+            )
             
-        url = f"{config.EXCHANGERATE_API_URL}/{config.EXCHANGERATE_API_KEY}/latest/{config.BASE_CURRENCY}"
+        url = (f"{config.EXCHANGERATE_API_URL}/"
+               f"{config.EXCHANGERATE_API_KEY}/"
+               f"latest/{config.BASE_CURRENCY}")
         
         try:
             response = requests.get(url, timeout=config.REQUEST_TIMEOUT)

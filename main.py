@@ -1,4 +1,3 @@
-from valutatrade_hub.core import models
 
 def main():
     print("Проект запущен")

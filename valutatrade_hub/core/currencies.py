@@ -18,7 +18,8 @@ class Currency(ABC):
             or " " in code
         ):
             raise ValueError(
-                "Код валюты должен быть в верхнем регистре, содержать от 2 до 5 символов и не иметь пробелов"
+                "Код валюты должен быть в верхнем регистре,\n"
+                "содержать от 2 до 5 символов и не иметь пробелов"
             )
 
         # Валидация name: не пустая строка
@@ -66,7 +67,9 @@ class CryptoCurrency(Currency):
         if not isinstance(algorithm, str) or not algorithm.strip():
             raise ValueError("Алгоритм не может быть пустым")
         if not isinstance(market_cap, (int, float)) or market_cap < 0:
-            raise ValueError("Рыночная капитализация должна быть неотрицательным числом")
+            raise ValueError(
+                "Рыночная капитализация должна быть неотрицательным числом"
+            )
 
         self.algorithm = algorithm.strip()
         self.market_cap = float(market_cap)
@@ -74,7 +77,10 @@ class CryptoCurrency(Currency):
     def get_display_info(self) -> str:
         # Приведение к компактной экспоненциальной записи (например, 1.12e12)
         mcap_formatted = f"{self.market_cap:.2e}".replace("+0", "").replace("+", "")
-        return f"[CRYPTO] {self.code} — {self.name} (Algo: {self.algorithm}, MCAP: {mcap_formatted})"
+        return (
+            f"[CRYPTO] {self.code} — {self.name}\n"
+            f"(Algo: {self.algorithm}, MCAP: {mcap_formatted})"
+        )
 
 
 # Базовый реестр валют платформы
